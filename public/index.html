@@ -4,11 +4,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-  <script type="text/javascript" src="/javascripts/jquery.js"></script>
-  <script type="text/javascript" src="/javascripts/handlebars.js"></script>
+  <title>Contact Manager</title>
+  <link rel="stylesheet" type="text/css" href="stylesheets/reset.css">
+  <link rel="stylesheet" type="text/css" href="stylesheets/styles.css">
+  <script src="javascripts/jquery.js"></script>
+  <script src="javascripts/handlebars.js"></script>
 </head>
 <body>
+	<header>
+		<h1>Contacts Manager</h1>
+		<h3>Using Backbone.js, RequireJS, Handlebar and BootStrap</h3>
+	</header>
+	<main>
+		<section id="actions">
+			<a id="add-btn" href="#">Add Contact</a>
+			<input type="text" name="search" placeholder="Search">
+		</section>
+		<form>
+			<h2>Create Contact</h2>
+			<fieldset>
+				<dl>
+					<dt>Full name:</dt>
+					<dd><input type="text" name="fullname" /></dd>
+					<dt>Email address:</dt>
+					<dd><input type="email" name="email" /></dd>
+					<dt>Telephone number:</dt>
+					<dd><input type="tel" name="phoneNumber" /></dd>
+				</dl>
+				<button>Submit</button>
+				<button>Cancel</button>
+			</fieldset>
+		</form>
+<!-- 		<section id="contacts-container" class="emptyContactsContainer"></section> -->
+	</main>
+	<footer>
+		<p>Developed by Jocie Moore</p>
+	</footer>
 
+	<script id="form" type="text/x-handlebars"></script>
+
+	<script id="contact" type="text/x-handlebars"></script>
+
+	<script src="javascripts/main.js"></script>
 </body>
 </html>
