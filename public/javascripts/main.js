@@ -4,8 +4,9 @@ var App = {
   templates: {},
   contacts: [],
   renderContacts: function() {
+    $('#contacts-container').empty();
+
     if (this.contacts.length >= 1) {
-      $('#contents-container').empty();
       $('#contacts-container').append(this.templates['all-contacts-script']({contacts: this.contacts}));
       $('#contacts-container').removeClass('empty-contacts-container');
     } else {
@@ -17,22 +18,18 @@ var App = {
       $('#contacts-container').addClass('empty-contacts-container');
     }
   },
-  createFormObject: function() {
-    var obj = {};
-
-    $('form').serializeArray().forEach(function(input) {
-      obj[input.name] = input.value;
-    });
-
-    return obj;
-  },
-  addContact: function() {
+  addContact: function(e) {
+    var self = this;
+    var data = $('form').serialize();
     var xhr = new XMLHttpRequest();
-    var data = this.createFormObject();
+
     xhr.open('POST', '/api/contacts');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
     xhr.addEventListener('load', function() {
       if (xhr.status === 201) {
         console.log('Contact added successfully.');
+        self.handleReturnToHome(e);
+        self.loadContacts();
       } else if (xhr.status === 400) {
         console.log('Error adding contact.');
       }
@@ -40,33 +37,23 @@ var App = {
     });
     xhr.send(data);
   },
-  handleCancel: function(e) {
-    e.preventDefault();
+  deleteContact: function(e) {
+    var $target = $(e.target);
+    var xhr = new XMLHttpRequest();
+    var id = $target.closest('.contact').data('id');
+    var self = this;
 
-    $('form').remove();
-    $('#contacts-container').show();
-  },
-  handleDelete: function(e) {
-    e.preventDefault();
-
-    $target = $(e.target);
-  },
-  handleAdd: function(e) {
-    e.preventDefault();
-
-    $('#contacts-container').hide();
-    $('main').append(this.templates['form-script']);
-  },
-  handleEdit: function(e) {
-    e.preventDefault();
-
-  },
-  handleSubmit: function(e) {
-    e.preventDefault();
-
-    this.addContact();
-    this.handleCancel(e);
-    this.loadContacts();
+    xhr.open('DELETE', '/api/contacts/' + id);
+    xhr.addEventListener('load', function() {
+      if (xhr.status === 204) {
+        console.log('SUCCESS deleting contact.');
+        self.loadContacts();
+      } else if (xhr.status === 400) {
+        console.log('Error deleting contact.');
+      }
+      console.log('Done deleting contact.');
+    });
+    xhr.send();
   },
   loadContacts: function() {
     var self = this;
@@ -84,12 +71,42 @@ var App = {
     });
     xhr.send(); 
   },
+  handleReturnToHome: function(e) {
+    e.preventDefault();
+    $('form').remove();
+    $('#contacts-container').show();
+  },
+  handleDeleteContact: function(e) {
+    e.preventDefault();
+    var isDeleteConfirm = confirm('Do you want to delete the contact?');
+    if (isDeleteConfirm) {
+      this.deleteContact(e);
+    }
+  },
+  handleAddBtnClick: function(e) {
+    e.preventDefault();
+    $('#contacts-container').hide();
+    $('main').append(this.templates['form-script']);
+  },
+  handleEditContact: function(e) {
+    e.preventDefault();
+    // put handlebars into form as placeholders
+    // get current contact
+    // pass this context to form 
+    // show form
+    // update sumbit with a PUT
+
+  },
+  handleSubmitToAddContact: function(e) {
+    e.preventDefault();
+    this.addContact(e);
+  },
   bindEvents: function() {
-    this.$main.on('click', '.add-btn', this.handleAdd.bind(this));
-    this.$main.on('click', '.edit-btn', this.handleEdit.bind(this));
-    this.$main.on('click', '.delete-btn', this.handleDelete.bind(this));
-    this.$main.on('click', '.cancel-btn', this.handleCancel.bind(this));
-    this.$main.on('click', '.submit-btn', this.handleSubmit.bind(this));
+    this.$main.on('click', '.add-btn', this.handleAddBtnClick.bind(this));
+    this.$main.on('click', '.edit-btn', this.handleEditContact.bind(this));
+    this.$main.on('click', '.delete-btn', this.handleDeleteContact.bind(this));
+    this.$main.on('click', '.cancel-btn', this.handleReturnToHome.bind(this));
+    this.$main.on('click', '.submit-btn', this.handleSubmitToAddContact.bind(this));
 
     // $('document').on('keypress', this.handleKeypress.bind(this));
   },
