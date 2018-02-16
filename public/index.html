@@ -13,37 +13,61 @@
 <body>
 	<header>
 		<h1>Contacts Manager</h1>
-		<h3>Using Backbone.js, RequireJS, Handlebar and BootStrap</h3>
+		<h4>Using Backbone.js, RequireJS, Handlebar and BootStrap</h4>
 	</header>
 	<main>
 		<section id="actions">
-			<a id="add-btn" href="#">Add Contact</a>
+			<a class="add-btn" href="#">Add Contact</a>
 			<input type="text" name="search" placeholder="Search">
 		</section>
-		<form>
-			<h2>Create Contact</h2>
-			<fieldset>
-				<dl>
-					<dt>Full name:</dt>
-					<dd><input type="text" name="fullname" /></dd>
-					<dt>Email address:</dt>
-					<dd><input type="email" name="email" /></dd>
-					<dt>Telephone number:</dt>
-					<dd><input type="tel" name="phoneNumber" /></dd>
-				</dl>
-				<button>Submit</button>
-				<button>Cancel</button>
-			</fieldset>
-		</form>
-<!-- 		<section id="contacts-container" class="emptyContactsContainer"></section> -->
+
+		<section id="contacts-container" class="empty-contacts-container"></section>
 	</main>
 	<footer>
 		<p>Developed by Jocie Moore</p>
 	</footer>
 
-	<script id="form" type="text/x-handlebars"></script>
+	<script id="form-script" type="text/x-handlebars">
+		<form>
+			<h2>Create Contact</h2>
+			<fieldset>
+				<dl>
+					<dt>Full name:</dt>
+					<dd><input type="text" name="full-name" /></dd>
+					<dt>Email address:</dt>
+					<dd><input type="email" name="email" /></dd>
+					<dt>Telephone number:</dt>
+					<dd><input type="tel" name="phone-number" /></dd>
+				</dl>
+				<div>
+					<button>Submit</button>
+					<button>Cancel</button>	
+				</div>
+			</fieldset>
+		</form>
+	</script>
 
-	<script id="contact" type="text/x-handlebars"></script>
+	<script id="all-contacts-script" type="text/x-handlebars">
+		{{#each contacts}}
+			{{> contact-script}}
+		{{/each}}
+	</script>
+
+	<script id="contact-script" type="text/x-handlebars" data-type="partial">
+		<div class="contact">
+			<h3>{{full_name}}</h3>
+			<dl>
+				<dt>Phone Number:</dt>
+				<dd>{{phone_number}}</dd>
+				<dt>Email:</dt>
+				<dd>{{email}}</dd>
+			</dl>
+			<div>
+				<a class="edit-btn" href="#">Edit</a>
+				<a class="delete-btn" href="#">Delete</a>	
+			</div>
+		</div>
+	</script>
 
 	<script src="javascripts/main.js"></script>
 </body>

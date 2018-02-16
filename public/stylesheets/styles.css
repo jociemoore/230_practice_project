@@ -1,5 +1,6 @@
 html {
 	font-family: Helvetica, Arial, 'sans-serif';
+	font-size: 14px;
 }
 
 header {
@@ -24,20 +25,13 @@ h2 {
 }
 
 h3 {
-	font-size: 20px;
-	font-weight: 100;
+	font-size: 24px;
+	font-weight: 400;
 }
 
-a {
-	color: #59407F;
-	text-decoration: none;
-	border-radius: 5px;
-	border: 1px solid #59407F;
-	padding: 15px;
-	width: 135px;
-	height: 45px;
-	font-size: 18px;
-	text-align: center;
+h4 {
+	font-size: 20px;
+	font-weight: 100;
 }
 
 main,
@@ -78,37 +72,110 @@ fieldset {
 	width: 80%;
 }
 
-dt {
+form dt {
 	display: inline-block;
 	width: 40%;
 	text-align: right;
 	padding-right: 25px;
+	font-weight: 600;
 }
 
-dd {
+form dd {
 	display: inline-block;
 	width: 59%;
+	margin-bottom: 25px;
 
 }
 
 form input {
 	width: 100%;
+	height: 35px;
+	border-radius: 5px;
+	border: 1px solid #CCC8C8;
+	padding-left: 10px;
+	box-shadow: inset 0 5px 5px -5px rgba(0,0,0,0.1);
 }
 
-form input[type="submit"] {
-/*	width: 215px;
-	float: right;*/
+form div {
+	width: 59%;
+	float: right;
+}
+
+form div button + button {
+	float: right;
+}
+
+form button {
+	color: #59407F;
+	text-decoration: none;
+	border-radius: 5px;
+	border: 1px solid #59407F;
+	background-color: #fff;
+	width: 45%;
+	height: 45px;
+	font-size: 18px;
+	text-align: center;
+}
+
+.contact {
+	border-bottom: 1px solid #F5F5F5;
+	width: 30%;
+	padding: 15px 0;
+	margin: 0 10px 30px 10px;
+	display: inline-block;
+}
+
+.contact h3 {
+	margin-bottom: 20px;
+}
+
+.contact dt {
+	font-weight: 600;
+	margin-bottom: 5px;
+}
+
+.contact dd {
+	margin-bottom: 5px;
+}
+
+.contact div {
+	margin: 25px 0;
+}
+
+.contact a:hover,
+#actions a:hover {
+	background-color: #59407F;
+	color: #fff;
+}
+
+.contact a,
+#actions a {
+	color: #59407F;
+	text-decoration: none;
+	border-radius: 5px;
+	border: 1px solid #59407F;
+	text-align: center;
+}
+
+.contact a {
+	padding: 10px;
+	margin-right: 15px;
+}
+
+#actions a {
+	padding: 10px;
+	width: 135px;
+	font-size: 16px;
 }
 
 #actions,
-.emptyContactsContainer {
+.empty-contacts-container {
 	background-color: #F5F5F5;	
 	border-radius: 5px;
 	border: 1px solid #E3E3E3;
 }
 
-#contacts-container {
-	margin: 15px;
+.empty-contacts-container {
 	padding: 20px;
 }
 
@@ -124,5 +191,4 @@ form input[type="submit"] {
 
 #contacts-container {
 	margin: 15px 15px 65px 15px;
-	padding: 20px;
 }
