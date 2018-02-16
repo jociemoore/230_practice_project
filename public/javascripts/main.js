@@ -1,27 +1,97 @@
-var contacts = [
-  // {id:1, full_name:'Joe Smoe', email:'joe@smoe.com', phone_number:'111-222-3333', tags:'work, friend'},
-  // {id:2, full_name:'Tina Franklin', email:'tina@franklin.com', phone_number:'555-555-5555', tags:'daughter'},
-  // {id:3, full_name:'Reese Winter', email:'reese@winter.com', phone_number:'888-888-9999', tags:'coach'},
-  // {id:4, full_name:'Sam Wise', email:'sam@wise.com', phone_number:'222-222-222', tags:'gardener'},
-  // {id:5, full_name:'Jarvis', email:'Jarvis@me.com', phone_number:'123-123-1234', tags:'caretaker'},
-]
 
 var App = {
+  $main: $('main'),
   templates: {},
-  contacts: contacts,
+  contacts: [],
   renderContacts: function() {
-    $('#contacts-container').append(this.templates['all-contacts-script']({contacts: this.contacts}));
-    $('#contacts-container').removeClass('empty-contacts-container');
+    if (this.contacts.length >= 1) {
+      $('#contents-container').empty();
+      $('#contacts-container').append(this.templates['all-contacts-script']({contacts: this.contacts}));
+      $('#contacts-container').removeClass('empty-contacts-container');
+    } else {
+      var $h3 = $('<h3></h3>').text('There are no contacts.');
+      var $addBtn = $('.add-btn').clone(true);
+  
+      $('#contacts-container').append($h3);
+      $('#contacts-container').append($addBtn);
+      $('#contacts-container').addClass('empty-contacts-container');
+    }
   },
-  renderNoContacts: function() {
+  createFormObject: function() {
+    var obj = {};
+
+    $('form').serializeArray().forEach(function(input) {
+      obj[input.name] = input.value;
+    });
+
+    return obj;
+  },
+  addContact: function() {
+    var xhr = new XMLHttpRequest();
+    var data = this.createFormObject();
+    xhr.open('POST', '/api/contacts');
+    xhr.addEventListener('load', function() {
+      if (xhr.status === 201) {
+        console.log('Contact added successfully.');
+      } else if (xhr.status === 400) {
+        console.log('Error adding contact.');
+      }
+      console.log('Done adding contact.');
+    });
+    xhr.send(data);
+  },
+  handleCancel: function(e) {
+    e.preventDefault();
+
+    $('form').remove();
+    $('#contacts-container').show();
+  },
+  handleDelete: function(e) {
+    e.preventDefault();
+
+    $target = $(e.target);
+  },
+  handleAdd: function(e) {
+    e.preventDefault();
+
+    $('#contacts-container').hide();
+    $('main').append(this.templates['form-script']);
+  },
+  handleEdit: function(e) {
+    e.preventDefault();
 
   },
-  handleContacts: function() {
-    if (contacts.length >= 1) {
-      this.renderContacts();
-    } else {
-      this.renderNoContacts();
-    }
+  handleSubmit: function(e) {
+    e.preventDefault();
+
+    this.addContact();
+    this.handleCancel(e);
+    this.loadContacts();
+  },
+  loadContacts: function() {
+    var self = this;
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('GET', '/api/contacts');
+    xhr.addEventListener('load', function(e) {
+      if (xhr.status === 200) {
+        self['contacts'] = JSON.parse(xhr.response);
+        self.renderContacts();
+      } else if (xhr.status === 404) {
+        console.log('Error retrieving contacts.');
+      }
+      console.log('Done processing contacts.');
+    });
+    xhr.send(); 
+  },
+  bindEvents: function() {
+    this.$main.on('click', '.add-btn', this.handleAdd.bind(this));
+    this.$main.on('click', '.edit-btn', this.handleEdit.bind(this));
+    this.$main.on('click', '.delete-btn', this.handleDelete.bind(this));
+    this.$main.on('click', '.cancel-btn', this.handleCancel.bind(this));
+    this.$main.on('click', '.submit-btn', this.handleSubmit.bind(this));
+
+    // $('document').on('keypress', this.handleKeypress.bind(this));
   },
   registerTemplates: function() {
     var self = this;
@@ -39,7 +109,8 @@ var App = {
   },
   init: function() {
     this.registerTemplates();
-    this.handleContacts();
+    this.bindEvents();
+    this.loadContacts();
   }
 }
 

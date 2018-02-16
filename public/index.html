@@ -20,7 +20,6 @@
 			<a class="add-btn" href="#">Add Contact</a>
 			<input type="text" name="search" placeholder="Search">
 		</section>
-
 		<section id="contacts-container" class="empty-contacts-container"></section>
 	</main>
 	<footer>
@@ -33,15 +32,17 @@
 			<fieldset>
 				<dl>
 					<dt>Full name:</dt>
-					<dd><input type="text" name="full-name" /></dd>
+					<dd><input type="text" name="full_name" /></dd>
 					<dt>Email address:</dt>
 					<dd><input type="email" name="email" /></dd>
 					<dt>Telephone number:</dt>
-					<dd><input type="tel" name="phone-number" /></dd>
+					<dd><input type="tel" name="phone_number" /></dd>
+					<dt>Tags:</dt>
+					<dd><input type="text" name="tags"></dd>
 				</dl>
 				<div>
-					<button>Submit</button>
-					<button>Cancel</button>	
+					<a class="submit-btn" href="#">Submit</a>
+					<a class="cancel-btn" href="#">Cancel</a>
 				</div>
 			</fieldset>
 		</form>
