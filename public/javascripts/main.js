@@ -3,6 +3,18 @@ var App = {
   $main: $('main'),
   templates: {},
   contacts: [],
+  prefillForm: function(e) {
+    var $currentContact = $(e.target).closest('.contact');
+    var fullName = $currentContact.find('h3').text(); 
+    var email = $currentContact.find('dl dd').last().text();
+    var phoneNumber = $currentContact.find('dl dd').first().text();
+
+    this.handleShowForm(e);
+
+    $('form').find("input[name='full_name']").attr('value', fullName);
+    $('form').find("input[name='email']").attr('value', email);
+    $('form').find("input[name='phone_number']").attr('value', phoneNumber);
+  },
   renderContacts: function() {
     $('#contacts-container').empty();
 
@@ -18,6 +30,31 @@ var App = {
       $('#contacts-container').addClass('empty-contacts-container');
     }
   },
+  convertBtn: function(e) {
+    var id = $(e.target).closest('.contact').data('id');
+    $('.submit-btn').addClass('update-btn')
+                    .removeClass('submit-btn')
+                    .attr('data-id', id);
+  },
+  updateContact: function(e) {
+    var self = this;
+    var id = $('.update-btn').data('id');
+    var data = $('form').serialize();
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('PUT', '/api/contacts/' + id);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    xhr.addEventListener('load', function() {
+      if (xhr.readyState === 4 && xhr.status === 201) {
+        console.log('Contact info updated successfully.');
+        self.handleReturnToHome(e);
+        self.loadContacts();
+      } else if (xhr.readyState === 4 && xhr.status === 400) {
+        console.log('Error updating contact info.');
+      }
+    });
+    xhr.send(data);
+  },
   addContact: function(e) {
     var self = this;
     var data = $('form').serialize();
@@ -26,14 +63,13 @@ var App = {
     xhr.open('POST', '/api/contacts');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
     xhr.addEventListener('load', function() {
-      if (xhr.status === 201) {
+      if (xhr.readyState === 4 && xhr.status === 201) {
         console.log('Contact added successfully.');
         self.handleReturnToHome(e);
         self.loadContacts();
-      } else if (xhr.status === 400) {
+      } else if (xhr.readyState === 4 && xhr.status === 400) {
         console.log('Error adding contact.');
       }
-      console.log('Done adding contact.');
     });
     xhr.send(data);
   },
@@ -45,13 +81,12 @@ var App = {
 
     xhr.open('DELETE', '/api/contacts/' + id);
     xhr.addEventListener('load', function() {
-      if (xhr.status === 204) {
-        console.log('SUCCESS deleting contact.');
+      if (xhr.readyState === 4 && xhr.status === 204) {
+        console.log('Contact deleted successfully.');
         self.loadContacts();
-      } else if (xhr.status === 400) {
+      } else if (xhr.readyState === 4 && xhr.status === 400) {
         console.log('Error deleting contact.');
       }
-      console.log('Done deleting contact.');
     });
     xhr.send();
   },
@@ -61,13 +96,13 @@ var App = {
 
     xhr.open('GET', '/api/contacts');
     xhr.addEventListener('load', function(e) {
-      if (xhr.status === 200) {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        console.log('Contacts loaded');
         self['contacts'] = JSON.parse(xhr.response);
         self.renderContacts();
-      } else if (xhr.status === 404) {
+      } else if (xhr.readyState === 4 && xhr.status === 404) {
         console.log('Error retrieving contacts.');
       }
-      console.log('Done processing contacts.');
     });
     xhr.send(); 
   },
@@ -83,29 +118,30 @@ var App = {
       this.deleteContact(e);
     }
   },
-  handleAddBtnClick: function(e) {
+  handleShowForm: function(e) {
     e.preventDefault();
     $('#contacts-container').hide();
     $('main').append(this.templates['form-script']);
   },
-  handleEditContact: function(e) {
+  handleShowUpdateForm: function(e) {
     e.preventDefault();
-    // put handlebars into form as placeholders
-    // get current contact
-    // pass this context to form 
-    // show form
-    // update sumbit with a PUT
-
+    this.prefillForm(e);
+    this.convertBtn(e);
+  },
+  handleUpdateContact: function(e) {
+    e.preventDefault();
+    this.updateContact(e);
   },
   handleSubmitToAddContact: function(e) {
     e.preventDefault();
     this.addContact(e);
   },
   bindEvents: function() {
-    this.$main.on('click', '.add-btn', this.handleAddBtnClick.bind(this));
-    this.$main.on('click', '.edit-btn', this.handleEditContact.bind(this));
+    this.$main.on('click', '.add-btn', this.handleShowForm.bind(this));
+    this.$main.on('click', '.edit-btn', this.handleShowUpdateForm.bind(this));
     this.$main.on('click', '.delete-btn', this.handleDeleteContact.bind(this));
     this.$main.on('click', '.cancel-btn', this.handleReturnToHome.bind(this));
+    this.$main.on('click', '.update-btn', this.handleUpdateContact.bind(this));
     this.$main.on('click', '.submit-btn', this.handleSubmitToAddContact.bind(this));
 
     // $('document').on('keypress', this.handleKeypress.bind(this));
