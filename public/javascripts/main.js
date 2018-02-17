@@ -72,11 +72,11 @@ var App = {
     this.renderErrorMessage(errorMsg, $(input));
   },
   validateControl: function(input) {
-    var name = $(input).attr('name');
+    var name = $(input).attr('name').split('_').join(' ');
     var errorMsg;
 
     if (input.validity.valueMissing) {
-      errorMsg = 'Please enter the ' + name + ' field.';
+      errorMsg = 'Please enter a ' + name + '.';
       this.renderInvalid(input, errorMsg);
     } else if (input.validity.patternMismatch) {
       errorMsg = 'Please enter a valid ' + name + '.';
