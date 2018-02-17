@@ -107,6 +107,7 @@ form input {
 	border-radius: 5px;
 	border: 1px solid #CCC8C8;
 	padding-left: 10px;
+	margin-bottom: 5px;
 	box-shadow: inset 0 5px 5px -5px rgba(0,0,0,0.1);
 }
 
@@ -185,6 +186,15 @@ a {
 
 .empty-contacts-container h3 {
 	margin-bottom: 20px;
+}
+
+.invalid {
+	border: 1px solid #dd0000;
+}
+
+.error {
+	color: #dd0000;
+	position: absolute;
 }
 
 #actions a {

@@ -27,16 +27,16 @@
 	</footer>
 
 	<script id="form-script" type="text/x-handlebars">
-		<form>
+		<form action="#" method="post" novalidate>
 			<h2>Create Contact</h2>
 			<fieldset>
 				<dl>
 					<dt>Full name:</dt>
 					<dd><input type="text" name="full_name" required/></dd>
 					<dt>Email address:</dt>
-					<dd><input type="email" name="email" /></dd>
+					<dd><input type="email" name="email" pattern=".+@.+\..+" required /></dd>
 					<dt>Telephone number:</dt>
-					<dd><input type="tel" name="phone_number" /></dd>
+					<dd><input type="tel" name="phone_number" required/></dd>
 					<dt>Tags:</dt>
 					<dd><input type="text" name="tags"></dd>
 				</dl>

@@ -3,17 +3,11 @@ var App = {
   $main: $('main'),
   templates: {},
   contacts: [],
-  prefillForm: function(e) {
-    var $currentContact = $(e.target).closest('.contact');
-    var fullName = $currentContact.find('h3').text(); 
-    var email = $currentContact.find('dl dd').last().text();
-    var phoneNumber = $currentContact.find('dl dd').first().text();
-
-    this.handleShowForm(e);
-
-    $('form').find("input[name='full_name']").attr('value', fullName);
-    $('form').find("input[name='email']").attr('value', email);
-    $('form').find("input[name='phone_number']").attr('value', phoneNumber);
+  convertBtn: function(e) {
+    var id = $(e.target).closest('.contact').data('id');
+    $('.submit-btn').addClass('update-btn')
+                    .removeClass('submit-btn')
+                    .attr('data-id', id);
   },
   renderContacts: function() {
     $('#contacts-container').empty();
@@ -30,11 +24,60 @@ var App = {
       $('#contacts-container').addClass('empty-contacts-container');
     }
   },
-  convertBtn: function(e) {
-    var id = $(e.target).closest('.contact').data('id');
-    $('.submit-btn').addClass('update-btn')
-                    .removeClass('submit-btn')
-                    .attr('data-id', id);
+  renderErrorMessage: function(msg, $input) {
+    var $lastElement = $input.closest('dd').children().last();
+
+    var $el = $('<p>', {
+      class: 'error',
+      text: msg
+    });
+
+    if ($lastElement.is('input')) {
+      $input.closest('dd').append($el);
+    }
+  },
+  renderValid: function(input) {
+    $(input).removeClass('invalid');
+
+    if ($(input).closest('dd').children().last().is('p')) {
+      $(input).closest('dd').find('p').remove();
+    }
+  },
+  renderInvalid: function(input, errorMsg) {
+    $(input).addClass('invalid');
+    this.renderErrorMessage(errorMsg, $(input));
+  },
+  validateControl: function(input) {
+    var name = $(input).attr('name');
+    var errorMsg;
+
+    if (input.validity.valueMissing) {
+      errorMsg = 'Please enter the ' + name + ' field.';
+      this.renderInvalid(input, errorMsg);
+    } else if (input.validity.patternMismatch) {
+      errorMsg = 'Please enter a valid ' + name + '.';
+      this.renderInvalid(input, errorMsg);
+    } else {
+      this.renderValid(input);
+    }
+  },
+  validateInputs: function() {
+    var self = this;
+    $('form input').each(function() {
+      self.validateControl(this);
+    });
+  },
+  prefillForm: function(e) {
+    var $currentContact = $(e.target).closest('.contact');
+    var fullName = $currentContact.find('h3').text(); 
+    var email = $currentContact.find('dl dd').last().text();
+    var phoneNumber = $currentContact.find('dl dd').first().text();
+
+    this.handleShowForm(e);
+
+    $('form').find("input[name='full_name']").attr('value', fullName);
+    $('form').find("input[name='email']").attr('value', email);
+    $('form').find("input[name='phone_number']").attr('value', phoneNumber);
   },
   updateContact: function(e) {
     var self = this;
@@ -130,11 +173,21 @@ var App = {
   },
   handleUpdateContact: function(e) {
     e.preventDefault();
-    this.updateContact(e);
+
+    if ($('form')[0].checkValidity()) {
+      this.updateContact(e);
+    } else {
+      this.validateInputs();
+    }
   },
   handleSubmitToAddContact: function(e) {
     e.preventDefault();
-    this.addContact(e);
+
+    if ($('form')[0].checkValidity()) {
+      this.addContact(e);
+    } else {
+      this.validateInputs();
+    }
   },
   bindEvents: function() {
     this.$main.on('click', '.add-btn', this.handleShowForm.bind(this));
