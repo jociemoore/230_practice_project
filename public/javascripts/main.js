@@ -11,30 +11,25 @@ var App = {
   },
   filterContacts: function(criteria) {
     return this.contacts.filter(function(contact) {
-      var name = contact.full_name.toUpperCase();
+      var name = contact.full_name;
       return (name.indexOf(criteria)) > -1;
     });
   },
-  getMatchingCriteria: function(e) {
-    var $searchbox = $("input[name='search']");
-    var keyCode = e.which;
-    var key = String.fromCharCode(keyCode);
-    var matchPhrase = $searchbox.val().toUpperCase();
+  getMatchingContacts: function() {
+    var matchingContacts = this.contacts;
 
-    if (keyCode >= 32 && keyCode <= 96) {
-      matchPhrase += key;
-    } else if (keyCode === 8) {
-      matchPhrase = matchPhrase.slice(0, matchPhrase.length - 1);
+    if (this.matchPhrase) {
+      matchingContacts = this.filterContacts(this.matchPhrase);
     }
 
-    return matchPhrase;
+    return matchingContacts;
   },
-  renderNoContacts: function(matchingCriteria) {
+  renderNoContacts: function() {
       var $addBtn = $('.add-btn').clone(true);
       var $h3;
 
-      if (matchingCriteria) {
-        $h3 = $('<h3></h3>').text('There are no contacts containing ' + matchingCriteria.toLowerCase() + '.');
+      if (this.matchPhrase) {
+        $h3 = $('<h3></h3>').text('There are no contacts containing ' + this.matchPhrase + '.');
       } else {
         $h3 = $('<h3></h3>').text('There are no contacts.');
       }
@@ -43,14 +38,14 @@ var App = {
       $('#contacts-container').append($addBtn);
       $('#contacts-container').addClass('empty-contacts-container');
   },
-  renderContacts: function(contacts, matchingCriteria) {
+  renderContacts: function(contacts) {
     $('#contacts-container').empty();
 
     if (contacts.length >= 1) {
       $('#contacts-container').append(this.templates['all-contacts-script']({contacts: contacts}));
       $('#contacts-container').removeClass('empty-contacts-container');
     } else {
-      this.renderNoContacts(matchingCriteria);
+      this.renderNoContacts();
     }
   },
   renderErrorMessage: function(msg, $input) {
@@ -219,14 +214,24 @@ var App = {
     }
   },
   handleKeydown: function(e) {
-    var matchingCriteria = this.getMatchingCriteria(e);
-    var matchingContacts = this.contacts;
+    var $searchbox = $("input[name='search']");
+    this.matchPhrase = $searchbox.val();
 
-    if (matchingCriteria) {
-      matchingContacts = this.filterContacts(matchingCriteria);
+    if (e.which === 8) {
+      this.matchPhrase = this.matchPhrase.slice(0, this.matchPhrase.length - 1);
     }
+    
+    this.renderContacts(this.getMatchingContacts());
+  },
+  handleKeypress: function(e) {
+    var keyCode = e.which;
+    var key = String.fromCharCode(keyCode);
 
-    this.renderContacts(matchingContacts, matchingCriteria);
+    if (keyCode >= 32 && keyCode <= 126) {
+      this.matchPhrase += key;
+    } 
+
+    this.renderContacts(this.getMatchingContacts());
   },
   bindEvents: function() {
     this.$main.on('click', '.add-btn', this.handleShowForm.bind(this));
@@ -235,8 +240,9 @@ var App = {
     this.$main.on('click', '.cancel-btn', this.handleReturnToHome.bind(this));
     this.$main.on('click', '.update-btn', this.handleUpdateContact.bind(this));
     this.$main.on('click', '.submit-btn', this.handleSubmitToAddContact.bind(this));
-
     $("input[name='search']").on('keydown', this.handleKeydown.bind(this));
+    $("input[name='search']").on('keypress', this.handleKeypress.bind(this));
+    
   },
   registerTemplates: function() {
     var self = this;
