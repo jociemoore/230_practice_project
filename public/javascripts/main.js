@@ -1,19 +1,32 @@
-
-var App = {
-  $main: $('main'),
-  templates: {},
+var ContactsManager = {
   contacts: [],
-  tags: [],
-  getAllTags: function() {
-    var $tagInputs = $("input[name='tag']:checked");
-    var tags = '';
 
-    $tagInputs.each(function(_, input) {
-      tags += input.value + ',';
-    });
+  renderContacts: function(contacts) {
+    $('#contacts-container').empty();
 
-    return tags;
+    if (contacts.length >= 1) {
+      $('#contacts-container').append(App.templates['all-contacts-script']({contacts: contacts}));
+      $('#contacts-container').removeClass('empty-contacts-container');
+    } else {
+      this.renderNoContacts();
+    }
   },
+
+  renderNoContacts: function() {
+      var $addBtn = $('.add-btn').clone(true);
+      var $h3;
+
+      if (App.matchPhrase) {
+        $h3 = $('<h3></h3>').text('There are no contacts containing ' + App.matchPhrase + '.');
+      } else {
+        $h3 = $('<h3></h3>').text('There are no contacts.');
+      }
+  
+      $('#contacts-container').append($h3);
+      $('#contacts-container').append($addBtn);
+      $('#contacts-container').addClass('empty-contacts-container');
+  },
+
   serializeData: function() {
     var $inputs = $('form').find('input[name]');
     var keysAndValues = [];
@@ -32,118 +45,7 @@ var App = {
     keysAndValues.push('tags=' + this.getAllTags());
     return keysAndValues.join('&');
   },
-  convertBtn: function(e) {
-    var id = $(e.target).closest('.contact').data('id');
-    $('.submit-btn').addClass('update-btn')
-                    .removeClass('submit-btn')
-                    .attr('data-id', id);
-  },
-  filterContactsByName: function(criteria) {
-    return this.contacts.filter(function(contact) {
-      var name = contact.full_name;
-      return (name.indexOf(criteria)) > -1;
-    });
-  },
-  getMatchingContactsByLetter: function() {
-    var matchingContacts = this.contacts;
 
-    if (this.matchPhrase) {
-      matchingContacts = this.filterContactsByName(this.matchPhrase);
-    }
-
-    return matchingContacts;
-  },
-  renderNoContacts: function() {
-      var $addBtn = $('.add-btn').clone(true);
-      var $h3;
-
-      if (this.matchPhrase) {
-        $h3 = $('<h3></h3>').text('There are no contacts containing ' + this.matchPhrase + '.');
-      } else {
-        $h3 = $('<h3></h3>').text('There are no contacts.');
-      }
-  
-      $('#contacts-container').append($h3);
-      $('#contacts-container').append($addBtn);
-      $('#contacts-container').addClass('empty-contacts-container');
-  },
-  renderTags: function() {
-    $('#tags-container').empty();
-    $('#tags-container').append(this.templates['all-tags-script']({tags: this.tags}));
-  },
-  renderContacts: function(contacts) {
-    $('#contacts-container').empty();
-
-    if (contacts.length >= 1) {
-      $('#contacts-container').append(this.templates['all-contacts-script']({contacts: contacts}));
-      $('#contacts-container').removeClass('empty-contacts-container');
-    } else {
-      this.renderNoContacts();
-    }
-  },
-  renderErrorMessage: function(msg, $input) {
-    var $lastElement = $input.closest('dd').children().last();
-
-    var $el = $('<p>', {
-      class: 'error',
-      text: msg
-    });
-
-    if ($lastElement.is('input')) {
-      $input.closest('dd').append($el);
-    }
-  },
-  renderValid: function(input) {
-    $(input).removeClass('invalid');
-
-    if ($(input).closest('dd').children().last().is('p')) {
-      $(input).closest('dd').find('p').remove();
-    }
-  },
-  renderInvalid: function(input, errorMsg) {
-    $(input).addClass('invalid');
-    this.renderErrorMessage(errorMsg, $(input));
-  },
-  validateControl: function(input) {
-    var name = $(input).attr('name').split('_').join(' ');
-    var errorMsg;
-
-    if (input.validity.valueMissing) {
-      errorMsg = 'Please enter a ' + name + '.';
-      this.renderInvalid(input, errorMsg);
-    } else if (input.validity.patternMismatch) {
-      errorMsg = 'Please enter a valid ' + name + '.';
-      this.renderInvalid(input, errorMsg);
-    } else {
-      this.renderValid(input);
-    }
-  },
-  validateInputs: function() {
-    var self = this;
-    $('form input').each(function() {
-      self.validateControl(this);
-    });
-  },
-  precheckTags: function($currentContact) {
-    var $contactTags = $currentContact.find('.contacts-tag-container').find('a');
-    
-    $contactTags.each(function(_, tag) {
-      var value = $(tag).text();
-      $('form').find('input[value=' + value + ']').attr('checked', true);
-    });
-  },
-  prefillForm: function(e) {
-    var $currentContact = $(e.target).closest('.contact');
-    var fullName = $currentContact.find('h3').text(); 
-    var email = $currentContact.find('dl dd').last().text();
-    var phoneNumber = $currentContact.find('dl dd').first().text();
-
-    this.handleShowNewForm(e);
-    $('form').find("input[name='full_name']").attr('value', fullName);
-    $('form').find("input[name='email']").attr('value', email);
-    $('form').find("input[name='phone_number']").attr('value', phoneNumber);
-    this.precheckTags($currentContact);
-  },
   updateContact: function(e) {
     var self = this;
     var id = $('.update-btn').data('id');
@@ -155,7 +57,7 @@ var App = {
     xhr.addEventListener('load', function() {
       if (xhr.readyState === 4 && xhr.status === 201) {
         console.log('Contact info updated successfully.');
-        self.handleReturnToHome(e);
+        App.handleReturnToHome(e);
         self.loadContacts();
       } else if (xhr.readyState === 4 && xhr.status === 400) {
         console.log('Error updating contact info.');
@@ -163,6 +65,7 @@ var App = {
     });
     xhr.send(data);
   },
+
   addContact: function(e) {
     var self = this;
     var data = this.serializeData();
@@ -173,7 +76,7 @@ var App = {
     xhr.addEventListener('load', function() {
       if (xhr.readyState === 4 && xhr.status === 201) {
         console.log('Contact added successfully.');
-        self.handleReturnToHome(e);
+        App.handleReturnToHome(e);
         self.loadContacts();
       } else if (xhr.readyState === 4 && xhr.status === 400) {
         console.log('Error adding contact.');
@@ -181,6 +84,7 @@ var App = {
     });
     xhr.send(data);
   },
+
   deleteContact: function(e) {
     var $target = $(e.target);
     var xhr = new XMLHttpRequest();
@@ -198,6 +102,7 @@ var App = {
     });
     xhr.send();
   },
+
   loadContacts: function() {
     var self = this;
     var xhr = new XMLHttpRequest();
@@ -215,6 +120,24 @@ var App = {
     });
     xhr.send(); 
   },
+
+  getMatchingContactsByLetter: function() {
+    var matchingContacts = this.contacts;
+
+    if (App.matchPhrase) {
+      matchingContacts = this.filterContactsByName(App.matchPhrase);
+    }
+
+    return matchingContacts;
+  },
+
+  filterContactsByName: function(criteria) {
+    return this.contacts.filter(function(contact) {
+      var name = contact.full_name;
+      return (name.indexOf(criteria)) > -1;
+    });
+  },
+
   handleTagData: function() {
     var self = this;
 
@@ -222,52 +145,158 @@ var App = {
       contact.tags = contact.tags.split(',')
       contact.tags.splice(contact.tags.length - 1, 1);
       uniqueTags = contact.tags.filter(function(tag, index) {
-        return self.tags.indexOf(tag) === -1;
+        return App.tags.indexOf(tag) === -1;
       });
-      self.tags = $.merge(self.tags, uniqueTags);
+      App.tags = $.merge(App.tags, uniqueTags);
     });
   },
+
+  getAllTags: function() {
+    var $tagInputs = $("input[name='tag']:checked");
+    var tags = '';
+
+    $tagInputs.each(function(_, input) {
+      tags += input.value + ',';
+    });
+
+    return tags;
+  },
+};
+
+
+var App = {
+  templates: {},
+  tags: [],
+
+  convertBtn: function(e) {
+    var id = $(e.target).closest('.contact').data('id');
+    $('.submit-btn').addClass('update-btn')
+                    .removeClass('submit-btn')
+                    .attr('data-id', id);
+  },
+
+  renderTags: function() {
+    $('#tags-container').empty();
+    $('#tags-container').append(this.templates['all-tags-script']({tags: this.tags}));
+  },
+
+  renderErrorMessage: function(msg, $input) {
+    var $lastElement = $input.closest('dd').children().last();
+
+    var $el = $('<p>', {
+      class: 'error',
+      text: msg
+    });
+
+    if ($lastElement.is('input')) {
+      $input.closest('dd').append($el);
+    }
+  },
+
+  renderValid: function(input) {
+    $(input).removeClass('invalid');
+
+    if ($(input).closest('dd').children().last().is('p')) {
+      $(input).closest('dd').find('p').remove();
+    }
+  },
+
+  renderInvalid: function(input, errorMsg) {
+    $(input).addClass('invalid');
+    this.renderErrorMessage(errorMsg, $(input));
+  },
+
+  validateControl: function(input) {
+    var name = $(input).attr('name').split('_').join(' ');
+    var errorMsg;
+
+    if (input.validity.valueMissing) {
+      errorMsg = 'Please enter a ' + name + '.';
+      this.renderInvalid(input, errorMsg);
+    } else if (input.validity.patternMismatch) {
+      errorMsg = 'Please enter a valid ' + name + '.';
+      this.renderInvalid(input, errorMsg);
+    } else {
+      this.renderValid(input);
+    }
+  },
+
+  validateInputs: function() {
+    var self = this;
+    $('form input').each(function() {
+      self.validateControl(this);
+    });
+  },
+
+  precheckTags: function($currentContact) {
+    var $contactTags = $currentContact.find('.contacts-tag-container').find('a');
+    
+    $contactTags.each(function(_, tag) {
+      var value = $(tag).text();
+      $('form').find('input[value=' + value + ']').attr('checked', true);
+    });
+  },
+
+  prefillForm: function(e) {
+    var $currentContact = $(e.target).closest('.contact');
+    var fullName = $currentContact.find('h3').text(); 
+    var email = $currentContact.find('dl dd').last().text();
+    var phoneNumber = $currentContact.find('dl dd').first().text();
+
+    this.handleShowNewForm(e);
+    $('form').find("input[name='full_name']").attr('value', fullName);
+    $('form').find("input[name='email']").attr('value', email);
+    $('form').find("input[name='phone_number']").attr('value', phoneNumber);
+    this.precheckTags($currentContact);
+  },
+
   handleReturnToHome: function(e) {
     e.preventDefault();
     $('form').remove();
     $('#contacts-container').show();
   },
+
   handleDeleteContact: function(e) {
     e.preventDefault();
     var isDeleteConfirm = confirm('Do you want to delete the contact?');
     if (isDeleteConfirm) {
-      this.deleteContact(e);
+      ContactsManager.deleteContact(e);
     }
   },
+
   handleShowNewForm: function(e) {
     e.preventDefault();
     $('#contacts-container').hide();
     $('main').append(this.templates['form-script']);
     this.renderTags();
   },
+
   handleShowUpdateForm: function(e) {
     e.preventDefault();
     this.prefillForm(e);
     this.convertBtn(e);
   },
+
   handleUpdateContact: function(e) {
     e.preventDefault();
 
     if ($('form')[0].checkValidity()) {
-      this.updateContact(e);
+      ContactsManager.updateContact(e);
     } else {
       this.validateInputs();
     }
   },
+
   handleSubmitToAddContact: function(e) {
     e.preventDefault();
 
     if ($('form')[0].checkValidity()) {
-      this.addContact(e);
+      ContactsManager.addContact(e);
     } else {
       this.validateInputs();
     }
   },
+
   handleKeydown: function(e) {
     var $searchbox = $("input[name='search']");
     this.matchPhrase = $searchbox.val();
@@ -276,8 +305,9 @@ var App = {
       this.matchPhrase = this.matchPhrase.slice(0, this.matchPhrase.length - 1);
     }
     
-    this.renderContacts(this.getMatchingContactsByLetter());
+    ContactsManager.renderContacts(ContactsManager.getMatchingContactsByLetter());
   },
+
   handleKeypress: function(e) {
     var keyCode = e.which;
     var key = String.fromCharCode(keyCode);
@@ -286,8 +316,9 @@ var App = {
       this.matchPhrase += key;
     } 
 
-    this.renderContacts(this.getMatchingContactsByLetter());
+    ContactsManager.renderContacts(ContactsManager.getMatchingContactsByLetter());
   },
+
   handleCreateTag: function(e) {
     e.preventDefault();
     var $target = $(e.target);
@@ -298,6 +329,7 @@ var App = {
     $newTagInput.val('');
     this.renderTags();
   },
+
   handleSortByTag: function(e) {
     e.preventDefault();
     var matchTag = $(e.target).text();
@@ -305,10 +337,11 @@ var App = {
       return contact.tags.includes(matchTag);
     });
 
-    this.renderContacts(matchingContactsByTag);
+    ContactsManager.renderContacts(matchingContactsByTag);
   },
+
   bindEvents: function() {
-    this.$main
+    $('main')
       .on('click', '.add-btn', this.handleShowNewForm.bind(this))
       .on('click', '.edit-btn', this.handleShowUpdateForm.bind(this))
       .on('click', '.delete-btn', this.handleDeleteContact.bind(this))
@@ -323,6 +356,7 @@ var App = {
       .on('keypress', this.handleKeypress.bind(this));
     
   },
+
   registerTemplates: function() {
     var self = this;
 
@@ -337,12 +371,13 @@ var App = {
       self.templates[name] = Handlebars.compile($template.html());
     });
   },
+
   init: function() {
     this.registerTemplates();
     this.bindEvents();
-    this.loadContacts();
+    ContactsManager.loadContacts();
   }
-}
+};
 
 App.init();
 
