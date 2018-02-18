@@ -38,9 +38,13 @@
 					<dt>Telephone number:</dt>
 					<dd><input type="tel" name="phone_number" required/></dd>
 					<dt>Tags:</dt>
-					<dd><input type="text" name="tags"></dd>
+					<dd>
+						<input type="text" />
+						<a class="create-tag-btn" href="#">Create Tag</a>
+					</dd>
 				</dl>
-				<div>
+				<div id="tags-container"></div>
+				<div id="form-btns">
 					<a class="submit-btn" href="#">Submit</a>
 					<a class="cancel-btn" href="#">Cancel</a>
 				</div>
@@ -48,9 +52,16 @@
 		</form>
 	</script>
 
-	<script id="all-contacts-script" type="text/x-handlebars">
-		{{#each contacts}}
-			{{> contact-script}}
+	<script id="all-tags-script" type="text/x-handlebars" data-type="partial">
+		{{#each tags}}
+				<input type="checkbox" name="tag" id="{{this}}" value="{{this}}"/>
+				<label class="form-tag" for="{{this}}">{{this}}</label>
+		{{/each}}
+	</script>
+
+	<script id="all-contact-tags" type="text/x-handlebars" data-type="partial">
+		{{#each this.tags}}
+			<a href="#" class="tag">{{this}}</a>
 		{{/each}}
 	</script>
 
@@ -63,11 +74,20 @@
 				<dt>Email:</dt>
 				<dd>{{email}}</dd>
 			</dl>
+			<div class="contacts-tag-container">
+				{{> all-contact-tags}}
+			</div>
 			<div>
 				<a class="edit-btn" href="#">Edit</a>
 				<a class="delete-btn" href="#">Delete</a>	
 			</div>
 		</div>
+	</script>
+
+	<script id="all-contacts-script" type="text/x-handlebars">
+		{{#each contacts}}
+			{{> contact-script}}
+		{{/each}}
 	</script>
 
 	<script src="javascripts/main.js"></script>
