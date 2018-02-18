@@ -163,10 +163,7 @@ var ContactsManager = {
   },
 };
 
-
-var App = {
-  templates: {},
-  tags: [],
+var FormManager = {
 
   convertBtn: function(e) {
     var id = $(e.target).closest('.contact').data('id');
@@ -177,7 +174,7 @@ var App = {
 
   renderTags: function() {
     $('#tags-container').empty();
-    $('#tags-container').append(this.templates['all-tags-script']({tags: this.tags}));
+    $('#tags-container').append(App.templates['all-tags-script']({tags: App.tags}));
   },
 
   renderErrorMessage: function(msg, $input) {
@@ -243,12 +240,18 @@ var App = {
     var email = $currentContact.find('dl dd').last().text();
     var phoneNumber = $currentContact.find('dl dd').first().text();
 
-    this.handleShowNewForm(e);
+    App.handleShowNewForm(e);
     $('form').find("input[name='full_name']").attr('value', fullName);
     $('form').find("input[name='email']").attr('value', email);
     $('form').find("input[name='phone_number']").attr('value', phoneNumber);
     this.precheckTags($currentContact);
   },
+
+};
+
+var App = {
+  templates: {},
+  tags: [],
 
   handleReturnToHome: function(e) {
     e.preventDefault();
@@ -268,13 +271,13 @@ var App = {
     e.preventDefault();
     $('#contacts-container').hide();
     $('main').append(this.templates['form-script']);
-    this.renderTags();
+    FormManager.renderTags();
   },
 
   handleShowUpdateForm: function(e) {
     e.preventDefault();
-    this.prefillForm(e);
-    this.convertBtn(e);
+    FormManager.prefillForm(e);
+    FormManager.convertBtn(e);
   },
 
   handleUpdateContact: function(e) {
@@ -283,7 +286,7 @@ var App = {
     if ($('form')[0].checkValidity()) {
       ContactsManager.updateContact(e);
     } else {
-      this.validateInputs();
+      FormManager.validateInputs();
     }
   },
 
@@ -293,7 +296,7 @@ var App = {
     if ($('form')[0].checkValidity()) {
       ContactsManager.addContact(e);
     } else {
-      this.validateInputs();
+      FormManager.validateInputs();
     }
   },
 
@@ -327,13 +330,13 @@ var App = {
 
     this.tags.push(newTag);
     $newTagInput.val('');
-    this.renderTags();
+    FormManager.renderTags();
   },
 
   handleSortByTag: function(e) {
     e.preventDefault();
     var matchTag = $(e.target).text();
-    var matchingContactsByTag = this.contacts.filter(function(contact) {
+    var matchingContactsByTag = ContactsManager.contacts.filter(function(contact) {
       return contact.tags.includes(matchTag);
     });
 
