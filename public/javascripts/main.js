@@ -5,21 +5,21 @@ var App = {
   contacts: [],
   tags: [],
   getAllTags: function() {
-    var tagInputs = $("input[name='tag']:checked");
+    var $tagInputs = $("input[name='tag']:checked");
     var tags = '';
 
-    tagInputs.each(function(_, input) {
+    $tagInputs.each(function(_, input) {
       tags += input.value + ',';
     });
 
     return tags;
   },
   serializeData: function() {
-    var inputs = $('form').find('input[name]');
+    var $inputs = $('form').find('input[name]');
     var keysAndValues = [];
 
-    for (var i = 0; i < inputs.length; i += 1) {
-      var input = inputs[i];
+    for (var i = 0; i < $inputs.length; i += 1) {
+      var input = $inputs[i];
       var key = encodeURIComponent(input.name);
       var value;
 
@@ -148,7 +148,6 @@ var App = {
     var self = this;
     var id = $('.update-btn').data('id');
     var data = this.serializeData();
-    console.log(data)
     var xhr = new XMLHttpRequest();
 
     xhr.open('PUT', '/api/contacts/' + id);
@@ -167,7 +166,6 @@ var App = {
   addContact: function(e) {
     var self = this;
     var data = this.serializeData();
-    console.log(data)
     var xhr = new XMLHttpRequest();
 
     xhr.open('POST', '/api/contacts');
