@@ -52,16 +52,9 @@
 		</form>
 	</script>
 
-	<script id="all-tags-script" type="text/x-handlebars" data-type="partial">
-		{{#each tags}}
-				<input type="checkbox" name="tag" id="{{this}}" value="{{this}}"/>
-				<label class="form-tag" for="{{this}}">{{this}}</label>
-		{{/each}}
-	</script>
-
-	<script id="all-contact-tags" type="text/x-handlebars" data-type="partial">
-		{{#each this.tags}}
-			<a href="#" class="tag">{{this}}</a>
+	<script id="all-contacts-script" type="text/x-handlebars">
+		{{#each contacts}}
+			{{> contact-script}}
 		{{/each}}
 	</script>
 
@@ -84,9 +77,16 @@
 		</div>
 	</script>
 
-	<script id="all-contacts-script" type="text/x-handlebars">
-		{{#each contacts}}
-			{{> contact-script}}
+	<script id="all-contact-tags" type="text/x-handlebars" data-type="partial">
+		{{#each this.tags}}
+			<a href="#" class="tag">{{this}}</a>
+		{{/each}}
+	</script>
+
+	<script id="all-tags-script" type="text/x-handlebars">
+		{{#each tags}}
+				<input type="checkbox" name="tag" id="{{this}}" value="{{this}}"/>
+				<label class="form-tag" for="{{this}}">{{this}}</label>
 		{{/each}}
 	</script>
 

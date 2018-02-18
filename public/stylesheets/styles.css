@@ -218,6 +218,13 @@ a {
 	position: absolute;
 }
 
+#tags-container input {
+	box-shadow: none;
+	width: inherit;
+	height: inherit;
+	margin-right: 10px;
+}
+
 #tags-container,
 #form-btns {
 	width: 59%;
@@ -227,13 +234,6 @@ a {
 
 #form-btns a + a {
 	float: right;
-}
-
-#tags-container input {
-	box-shadow: none;
-	width: inherit;
-	height: inherit;
-	margin-right: 10px;
 }
 
 #actions a {

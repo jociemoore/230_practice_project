@@ -310,17 +310,19 @@ var App = {
     this.renderContacts(matchingContactsByTag);
   },
   bindEvents: function() {
-    this.$main.on('click', '.add-btn', this.handleShowNewForm.bind(this));
-    this.$main.on('click', '.edit-btn', this.handleShowUpdateForm.bind(this));
-    this.$main.on('click', '.delete-btn', this.handleDeleteContact.bind(this));
-    this.$main.on('click', '.cancel-btn', this.handleReturnToHome.bind(this));
-    this.$main.on('click', '.update-btn', this.handleUpdateContact.bind(this));
-    this.$main.on('click', '.submit-btn', this.handleSubmitToAddContact.bind(this));
-    this.$main.on('click', '.create-tag-btn', this.handleCreateTag.bind(this));
-    this.$main.on('click', '.tag', this.handleSortByTag.bind(this));
+    this.$main
+      .on('click', '.add-btn', this.handleShowNewForm.bind(this))
+      .on('click', '.edit-btn', this.handleShowUpdateForm.bind(this))
+      .on('click', '.delete-btn', this.handleDeleteContact.bind(this))
+      .on('click', '.cancel-btn', this.handleReturnToHome.bind(this))
+      .on('click', '.update-btn', this.handleUpdateContact.bind(this))
+      .on('click', '.submit-btn', this.handleSubmitToAddContact.bind(this))
+      .on('click', '.create-tag-btn', this.handleCreateTag.bind(this))
+      .on('click', '.tag', this.handleSortByTag.bind(this));
 
-    $("input[name='search']").on('keydown', this.handleKeydown.bind(this));
-    $("input[name='search']").on('keypress', this.handleKeypress.bind(this));
+    $("input[name='search']")
+      .on('keydown', this.handleKeydown.bind(this))
+      .on('keypress', this.handleKeypress.bind(this));
     
   },
   registerTemplates: function() {
