@@ -1,3 +1,3 @@
-# 230 Contacts Manager Practice Project
+# Contacts Manager Application
 
-This practice project focuses on using the concepts learned in the DOM and Asynchronous Programming with JavaScript course to build a website that keeps track of contact information.
+This application keeps track of contact information. You can create, edit, delete, and dynamically search through contacts. With this project, I practiced using APIs, event-driven programming, working with jQuery and the DOM, and communicating with the server.
